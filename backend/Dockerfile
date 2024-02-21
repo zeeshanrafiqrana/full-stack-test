@@ -14,3 +14,6 @@ RUN pip install -r requirements.txt
 
 # Copy project
 COPY . /code/
+
+# Run migrations
+RUN python manage.py migrate
