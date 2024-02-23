@@ -1,13 +1,17 @@
-// src/hooks/useStockData.js
 import { useQuery } from "react-query";
 import axios from "axios";
 
 const fetchStockData = async (stockSymbol, startDate) => {
-  // Fetch data from Alpha Vantage API
-  const response = await axios.get(
-    `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${stockSymbol}&apikey=YOUR_API_KEY`
-  );
-  return response.data;
+  const url =  `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=IBM&apikey=CK5H3JAGHKQ6NJ96`
+  try {
+    // Fetch data from Alpha Vantage API
+    const response = await axios.get(
+      url
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error("Error fetching stock data");
+  }
 };
 
 const useStockData = (stockSymbol, startDate) => {

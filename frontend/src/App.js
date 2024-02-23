@@ -1,5 +1,5 @@
 import React from "react";
-import { QueryClient, QueryClientProvider, useQuery } from "react-query";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
@@ -10,18 +10,6 @@ import Header from "./Components/Header";
 import "./index.css";
 // Create a client
 const queryClient = new QueryClient();
-
-function FetchHelloWorld() {
-  const { isLoading, error, data } = useQuery("fetchHello", () =>
-    fetch("http://localhost:8000/api/hello/").then((res) => res.json())
-  );
-
-  if (isLoading) return "Loading...";
-
-  if (error) return "An error has occurred: " + error.message;
-
-  return <div>{data.message}</div>;
-}
 
 function App() {
   return (

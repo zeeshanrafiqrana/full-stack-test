@@ -1,7 +1,10 @@
-import React from "react";
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import useStockData from "../hooks/useStockData";
+import { FaCalendar } from "react-icons/fa";
 import {
   LineChart,
   Line,
@@ -12,11 +15,22 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+import SharePriceList from "./SharePriceList";
+import axios from "axios";
 
 const SharePrice = () => {
-  const { control, register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    control,
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm();
+  const [stockData, setStockData] = useState(null);
 
-  const onSubmit = (data) => {
+  const { data } = useStockData();
+
+  const onSubmit = async (data) => {
     const formattedData = {
       ...data,
       "date-input": data["date-input"] ? formatDate(data["date-input"]) : null,
@@ -25,96 +39,126 @@ const SharePrice = () => {
 
   const formatDate = (date) => {
     const d = new Date(date);
-    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+    return `${d.getMonth() + 1}/${d.getFullYear()}`;
   };
 
   const chartData = [
     { month: "January", price: 65 },
     { month: "February", price: 59 },
-    { month: "March", price: 80 },
+    { month: "March", price: 40 },
     { month: "April", price: 81 },
     { month: "May", price: 56 },
     { month: "June", price: 55 },
     { month: "July", price: 40 },
-    { month: "August", price: 40 },
-    { month: "November", price: 40 },
-    { month: "December", price: 40 },
+    { month: "August", price: 10 },
+    { month: "November", price: 30 },
+    { month: "December", price: 0 },
   ];
 
-  return (
-    <div className="bg-white rounded-lg overflow-hidden pb-5">
-      <div className="flex parentShareprice p-4">
-        <div className="flex-1 p-4">
-          <h2 className="text-lg">
-            <strong>Share Price</strong>
-          </h2>
-          <h3 className="mr-2 text-sm">USA</h3>
+  const CustomTooltip = ({ active, label, payload }) => {
+    if (active) {
+      return (
+        <div className="custom-tooltip" style={{ color: "white" }}>
+          <p className="label">{`${label} : ${payload[0].value}`}</p>
+          <p className="label">{`${label} : ${payload[0].value}`}</p>
+          <p className="label">{`${label} : ${payload[0].value}`}</p>
         </div>
-        <div className="flex-1 p-4 flex justify-end">
-          <form onSubmit={handleSubmit(onSubmit)} className="flex items-center">
-            <h3 className="mr-2 text-sm">
-              <strong>Starting Month</strong>
-            </h3>
-            <div>
+      );
+    }
+
+    return null;
+  };
+
+  return (
+    <>
+      <div className="bg-white rounded-lg overflow-hidden pb-5">
+        <div className="parentShareprice p-4 sm:flex xs:grid">
+          <div className="flex-1 p-4">
+            <h2 className="text-lg">
+              <strong>Share Price</strong>
+            </h2>
+            <h3 className="mr-2 text-sm">USA</h3>
+          </div>
+          <div className="flex-1 p-4 flex justify-end form-wrapper">
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex items-center"
+            >
+              <h3 className="mr-2 text-sm">
+                <strong>Starting Month</strong>
+              </h3>
               <Controller
                 control={control}
                 name="date-input"
                 render={({ field }) => (
-                  <div>
-                    <DatePicker
-                      placeholderText="Select date"
-                      onChange={(date) => field.onChange(date)}
-                      selected={field.value}
-                      dateFormat="MM/dd/yyyy"
-                      className="border border-gray-300 rounded-md p-2 pl-2 focus:outline-none focus:border-blue-500"
-                    />
+                  <div className="controllerrr">
+                    <div className="relative" style={{ width: "140px" }}>
+                      <DatePicker
+                        placeholderText="Select month"
+                        onChange={(date) => {
+                          setValue("date-input", date);
+                        }}
+                        selected={field.value}
+                        dateFormat="MM/yyyy"
+                        showMonthYearPicker
+                        className="border border-gray-300 rounded-md p-2 pl-2 focus:outline-none focus:border-blue-500 w-full"
+                      />
+                      <div className="absolute top-2 right-3">
+                        <FaCalendar size={20} color="#57E9E0" />
+                      </div>
+                    </div>
                   </div>
                 )}
               />
               {errors["date-input"] && (
                 <div className="text-red-500 text-sm mt-1 ml-2">
-                  Please select a date
+                  Please select a month
                 </div>
               )}
-            </div>
-            <input
-              type="text"
-              {...register("stock", { required: true })}
-              placeholder="Enter Stock"
-              className="border border-gray-300 rounded-md p-2 ml-2"
-            />
-            {errors.stock && (
-              <div className="text-red-500 text-sm mt-1 ml-2">
-                Stock is required
-              </div>
-            )}
-            <button
-              type="submit"
-              className="bg-blue-500 text-white py-2 px-4 rounded-md ml-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
-            >
-              Update
-            </button>
-          </form>
+              <input
+                type="text"
+                {...register("stock", { required: true })}
+                placeholder="Enter a stock symbol"
+                className="border border-gray-300 rounded-md p-2 ml-2"
+              />
+              {errors.stock && (
+                <div className="text-red-500 text-sm mt-1 ml-2">
+                  Stock is required
+                </div>
+              )}
+              <button
+                type="submit"
+                className="submitButton bg-blue-500 text-white py-2 px-4 rounded-md ml-2 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+              >
+                Update
+              </button>
+            </form>
+          </div>
+        </div>
+        <div className="graph-box">
+          <ResponsiveContainer width="100%" aspect={5}>
+            <LineChart className="chartDataa" data={chartData} width={100} height={260}>
+              <CartesianGrid stroke="#eee" strokeDasharray="10 0" horizontal={true} vertical={false} className="cartasianGrid" />
+              <XAxis className="xCode" dataKey="month" />
+              <YAxis />
+              <Tooltip
+                content={<CustomTooltip />}
+                wrapperStyle={{ backgroundColor: "black", width: "10%", padding:"10px", borderRadius:"10px" }}
+              />
+              <Legend />
+              <Line
+                type="monotone"
+                dataKey="price"
+                stroke="#880ED4"
+                activeDot={{ r: 8 }}
+                strokeWidth={4}
+              />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
-      <div className="graph-box">
-        <ResponsiveContainer width="100%" aspect={5}>
-          <LineChart data={chartData} width={100} height={300}>
-            <CartesianGrid stroke="#eee" strokeDasharray="5 5" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Line
-              type="monotone"
-              dataKey="price"
-              stroke="#8884d8"
-              activeDot={{ r: 8 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+      <SharePriceList/>
+    </>
   );
 };
 

@@ -10,20 +10,73 @@ body {
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
-.header-nav{
+.header-nav {
   border-bottom: 4px solid #9797a5;
   padding-bottom: 14px;
   width: fit-content;
 }
-.App{
+.App,
+#root {
   height: 100vh;
 }
-.recharts-surface{
-  padding-right: 30px!important;
+.App-header {
+  padding: 0px 40px;
 }
-.recharts-legend-wrapper{
+.recharts-surface {
+  padding-right: 30px !important;
+}
+.recharts-legend-wrapper {
   display: none;
+}
+.submitButton,
+.submitButton:hover {
+  background-color: #57e9e0 !important;
+  color: #115c5e;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 2px solid #115c5e;
+}
+.tableCardBody {
+  overflow-x: hidden;
+  width: 80%;
+}
+@media (max-width: 900px) {
+  .tableCardBody {
+    overflow-x: auto;
+    width: 100%;
+  }
+  .form-wrapper form {
+    display: grid;
+    width: 100%;
+  }
+  .controllerrr,
+  .form-wrapper form input,
+  .submitButton {
+    margin: 04px 0;
+    width: 100%;
+  }
+}
+@media (max-width: 769px) {
+  .tableCardBody {
+    overflow-x: auto;
+    width: 100%;
+  }
+  .form-wrapper form {
+    display: grid;
+    width: 100%;
+  }
+  .App-header {
+    padding: 10px;
+  }
+  .header-nav a {
+    font-size: 12px;
+    padding-bottom: 21px !important;
+  }
+}
+.tableHead tr th {
+  border-top: 0px;
+  border-bottom: 1px solid #e5e7eb;
 }
