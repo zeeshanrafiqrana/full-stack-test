@@ -15,5 +15,8 @@ RUN pip install -r requirements.txt
 # Copy project
 COPY . /code/
 
+#Run Test Before
+RUN python manage.py test api.tests
+
 # Run migrations
 RUN python manage.py migrate
