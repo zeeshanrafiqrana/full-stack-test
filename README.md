@@ -40,3 +40,40 @@ You are not expected to complete all the tickets within the 8 hours, just do as 
   - Any instructions needed to run the tests
   - Any other relevant information
 - Make sure to push the code to your GitHub repo and send me the link to it in the chat on upwork
+
+## Task Completions Report
+- Following tasks are completed within timeline
+  - [1. Line graph with share price from external API data](https://app.shortcut.com/crispatestb/story/37/1-line-graph-with-share-price-from-external-api-data)
+  - [2. Table view of daily share price data](https://app.shortcut.com/crispatestb/story/36/2-table-view-of-daily-share-price-data)
+  - [3. Data models](https://app.shortcut.com/crispatestb/story/35/3-data-models)
+  - [4. CRUD end-points](https://app.shortcut.com/crispatestb/story/34/4-crud-end-points)
+  - [5. Django admin views](https://app.shortcut.com/crispatestb/story/32/5-django-admin-views)
+  - [6. Tests for all end-points](https://app.shortcut.com/crispatestb/story/31/6-tests-for-all-end-points)
+  - [9. Csv export of transactions](https://app.shortcut.com/crispatestb/story/28/9-csv-export-of-transactions)
+  - [12. Swagger documentation](https://app.shortcut.com/crispatestb/story/25/12-swagger-documentation) (Postman Document Created and Published) [Postman documenter](https://documenter.getpostman.com/view/10211784/2sA2rCU1qA)
+
+**Instructions**
+Same as previous build, Just need to build docker again.
+Clone or download repository locally and run `docker-compose up --build`
+
+Regarding backend
+ - Proper Pagination implemented
+ - Proper Rest Framework method used accoding PEP 8 guides.
+ - Django Unit test wroted in api app.
+ - Same response format for all endpoints
+ - Export CSV endpoint also returning proper csv format data
+ - Proper validation for Journal Entry states(draft, booked)
+ - Loom Video for Backend Work [Admin View and API documentation View](https://www.loom.com/share/108e2b4cf43845b9b1dc6dfc75e3b80d)
+ - For Backend Code review I opened a PR and merged this into main. [Only Backend and Readme](https://github.com/zeeshanrafiqrana/full-stack-test/pull/1)
+ Feel free to provide feedback over Backend changes, I will be highly thankful.
+
+ Regarding Frontend:
+ - Tailwindcss Applied 
+ - Routing build
+ - React Forms hooks used
+ - Redux toolkit configured.
+ - Basic strcutured build
+ - Code pushed to main app.
+ - React chart integrated and Table created by using Tailwindcss
+ A short loom video [Tasks Completed UI](https://www.loom.com/share/e84a02d9cb6b47adaf36e4856519efd9)
+
