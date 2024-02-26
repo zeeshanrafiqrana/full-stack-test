@@ -5,6 +5,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import useStockData from "../hooks/useStockData";
 import { FaCalendar } from "react-icons/fa";
+
+
 import {
   LineChart,
   Line,
@@ -15,8 +17,8 @@ import {
   ResponsiveContainer,
   CartesianGrid,
 } from "recharts";
+
 import SharePriceList from "./SharePriceList";
-import axios from "axios";
 
 const SharePrice = () => {
   const {
@@ -27,8 +29,32 @@ const SharePrice = () => {
     formState: { errors },
   } = useForm();
   const [stockData, setStockData] = useState(null);
+  const [stockDataError, setStockDataError] = useState(null);
 
   const { data } = useStockData();
+
+  useEffect(() => {
+    if (data && data['Monthly Time Series']) {
+      const monthlyData = data['Monthly Time Series'];
+      const formattedData = Object.entries(monthlyData).map(([date, data]) => ({
+        month: new Date(date).toLocaleString('default', { month: 'short' }), // Converts '2024-02-23' to 'Feb'
+        high: parseFloat(data['2. high']),
+        low: parseFloat(data['3. low']),
+        close: parseFloat(data['4. close']),
+        volume: parseFloat(data['5. volume']),
+        // Include other data points if needed
+      })).reverse(); // Reverse to start the graph with the oldest data
+  
+      setStockData(formattedData); // Update your state with the formatted data
+    }
+    else {
+      if (data && data['Information'] ){
+        setStockDataError(data['Information']);
+      }
+    }
+  }, [data]); // Rerun the effect if `data` changes
+  debugger
+  console.log(stockData)
 
   const onSubmit = async (data) => {
     const formattedData = {
@@ -56,12 +82,16 @@ const SharePrice = () => {
   ];
 
   const CustomTooltip = ({ active, label, payload }) => {
-    if (active) {
+    
+    if (active && payload.length>0) {
+      console.log("payload", payload)
       return (
         <div className="custom-tooltip" style={{ color: "white" }}>
-          <p className="label">{`${label} : ${payload[0].value}`}</p>
-          <p className="label">{`${label} : ${payload[0].value}`}</p>
-          <p className="label">{`${label} : ${payload[0].value}`}</p>
+          <p className="label">{`close : ${payload[0].payload.close}`}</p>
+          <p className="label">{`high : ${payload[0].payload.high}`}</p>
+          <p className="label">{`low : ${payload[0].payload.low}`}</p>
+          <p className="label">{`volume : ${payload[0].payload.volume}`}</p>
+          <p className="label">{`month : ${payload[0].payload.month}`}</p>
         </div>
       );
     }
@@ -137,27 +167,43 @@ const SharePrice = () => {
         </div>
         <div className="graph-box">
           <ResponsiveContainer width="100%" aspect={5}>
-            <LineChart className="chartDataa" data={chartData} width={100} height={260}>
-              <CartesianGrid stroke="#eee" strokeDasharray="10 0" horizontal={true} vertical={false} className="cartasianGrid" />
+            {stockData && !stockDataError? <LineChart
+              className="chartDataa"
+              data={stockData}
+              width={100}
+              height={260}
+            >
+              <CartesianGrid
+                stroke="#eee"
+                strokeDasharray="10 0"
+                horizontal={true}
+                vertical={false}
+                className="cartasianGrid"
+              />
               <XAxis className="xCode" dataKey="month" />
               <YAxis />
               <Tooltip
                 content={<CustomTooltip />}
-                wrapperStyle={{ backgroundColor: "black", width: "10%", padding:"10px", borderRadius:"10px" }}
+                wrapperStyle={{
+                  backgroundColor: "black",
+                  width: "10%",
+                  padding: "10px",
+                  borderRadius: "10px",
+                }}
               />
               <Legend />
               <Line
                 type="monotone"
-                dataKey="price"
+                dataKey="low"
                 stroke="#880ED4"
                 activeDot={{ r: 8 }}
                 strokeWidth={4}
               />
-            </LineChart>
+            </LineChart>: <div className="text-red-700 p-8">{stockDataError}</div>}
           </ResponsiveContainer>
         </div>
       </div>
-      <SharePriceList/>
+      <SharePriceList />
     </>
   );
 };
