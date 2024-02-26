@@ -38,6 +38,7 @@ const SharePrice = () => {
       const monthlyData = data['Monthly Time Series'];
       const formattedData = Object.entries(monthlyData).map(([date, data]) => ({
         month: new Date(date).toLocaleString('default', { month: 'short' }), // Converts '2024-02-23' to 'Feb'
+        open: parseFloat(data['1. open']),
         high: parseFloat(data['2. high']),
         low: parseFloat(data['3. low']),
         close: parseFloat(data['4. close']),
@@ -53,8 +54,6 @@ const SharePrice = () => {
       }
     }
   }, [data]); // Rerun the effect if `data` changes
-  debugger
-  console.log(stockData)
 
   const onSubmit = async (data) => {
     const formattedData = {
@@ -68,25 +67,13 @@ const SharePrice = () => {
     return `${d.getMonth() + 1}/${d.getFullYear()}`;
   };
 
-  const chartData = [
-    { month: "January", price: 65 },
-    { month: "February", price: 59 },
-    { month: "March", price: 40 },
-    { month: "April", price: 81 },
-    { month: "May", price: 56 },
-    { month: "June", price: 55 },
-    { month: "July", price: 40 },
-    { month: "August", price: 10 },
-    { month: "November", price: 30 },
-    { month: "December", price: 0 },
-  ];
-
   const CustomTooltip = ({ active, label, payload }) => {
     
     if (active && payload.length>0) {
       console.log("payload", payload)
       return (
         <div className="custom-tooltip" style={{ color: "white" }}>
+          <p className="label">{`open : ${payload[0].payload.open}`}</p>
           <p className="label">{`close : ${payload[0].payload.close}`}</p>
           <p className="label">{`high : ${payload[0].payload.high}`}</p>
           <p className="label">{`low : ${payload[0].payload.low}`}</p>
