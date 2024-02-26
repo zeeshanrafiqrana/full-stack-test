@@ -6,7 +6,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import useStockData from "../hooks/useStockData";
 import { FaCalendar } from "react-icons/fa";
 
-
 import {
   LineChart,
   Line,
@@ -30,37 +29,39 @@ const SharePrice = () => {
   } = useForm();
   const [stockData, setStockData] = useState(null);
   const [stockDataError, setStockDataError] = useState(null);
+  const [stockSymbol, setStockSymbol] = useState("");
 
-  const { data } = useStockData();
+  const { data, isLoading, isError } = useStockData(stockSymbol);
 
   useEffect(() => {
     if (data && data['Monthly Time Series']) {
       const monthlyData = data['Monthly Time Series'];
       const formattedData = Object.entries(monthlyData).map(([date, data]) => ({
-        month: new Date(date).toLocaleString('default', { month: 'short' }), // Converts '2024-02-23' to 'Feb'
+        month: new Date(date).toLocaleString('default', { month: 'short' }),
         high: parseFloat(data['2. high']),
         low: parseFloat(data['3. low']),
         close: parseFloat(data['4. close']),
         volume: parseFloat(data['5. volume']),
-        // Include other data points if needed
-      })).reverse(); // Reverse to start the graph with the oldest data
+      })).reverse();
   
-      setStockData(formattedData); // Update your state with the formatted data
+      setStockData(formattedData);
     }
     else {
       if (data && data['Information'] ){
         setStockDataError(data['Information']);
       }
     }
-  }, [data]); // Rerun the effect if `data` changes
-  debugger
-  console.log(stockData)
+  }, [data]);
 
   const onSubmit = async (data) => {
+    const stockSymbol = data.stock;
+    setStockSymbol(stockSymbol);
     const formattedData = {
       ...data,
       "date-input": data["date-input"] ? formatDate(data["date-input"]) : null,
     };
+    console.log('formattedData', formattedData);
+    console.log('stockSymbol', stockSymbol);  
   };
 
   const formatDate = (date) => {
