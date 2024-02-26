@@ -53,7 +53,6 @@ const SharePrice = () => {
       }
     }
   }, [data]); // Rerun the effect if `data` changes
-  debugger
   console.log(stockData)
 
   const onSubmit = async (data) => {

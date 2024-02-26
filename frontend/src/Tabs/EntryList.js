@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
-// import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-// import { PencilIcon, UserPlusIcon } from "@heroicons/react/24/solid";
 import {
   Card,
   CardHeader,
   Typography,
-  CardBody,  
+  CardBody,
 } from "@material-tailwind/react";
-import { useQuery } from 'react-query';
+import "../index.css";
 
 
 const TABLE_HEAD = [
@@ -26,103 +24,46 @@ const TABLE_HEAD = [
   "RECONCILED",
 ];
 
-const TABLE_ROWS = [
-  {
-    id: 1234,
-    description: "Lorem ipsum dolar sit amet...",
-    date: "23/04/18",
-    account: "1000",
-    inputType: "Credit",
-    inputCurrency: "EUR",
-    inputNet: "540,15",
-    fxRate: "7,45",
-    convertedCurrency: "DDK",
-    convertedNet: "540,15",
-    convertedType: "spend",
-    status: "BOOKED",
-    reconciled: "YES",
-  },
-  {
-    id: 1244,
-    description: "Lorem ipsum dolar sit amet...",
-    date: "23/04/18",
-    account: "1000",
-    inputType: "Credit",
-    inputCurrency: "EUR",
-    inputNet: "540,15",
-    fxRate: "7,45",
-    convertedCurrency: "DDK",
-    convertedNet: "540,15",
-    convertedType: "spend",
-    status: "DRAFT",
-    reconciled: "NO",
-  },
-  {
-    id: 3234,
-    description: "Lorem ipsum dolar sit amet...",
-    date: "23/04/18",
-    account: "1000",
-    inputType: "Credit",
-    inputCurrency: "EUR",
-    inputNet: "540,15",
-    fxRate: "7,45",
-    convertedCurrency: "DDK",
-    convertedNet: "540,15",
-    convertedType: "spend",
-    status: "VOIDED",
-    reconciled: "NO",
-  },
-  {
-    id: 3234,
-    description: "Lorem ipsum dolar sit amet...",
-    date: "23/04/18",
-    account: "1000",
-    inputType: "Credit",
-    inputCurrency: "EUR",
-    inputNet: "540,15",
-    fxRate: "7,45",
-    convertedCurrency: "DDK",
-    convertedNet: "540,15",
-    convertedType: "spend",
-    status: "OVERDUE",
-    reconciled: "NO",
-  },
-];
-
 const EntryList = () => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "BOOKED":
-        return "bg-sky-200 text-sky-600 text-center p-1 rounded-md";
-      case "DRAFT":
-        return "bg-purple-200 text-purple-600 text-center p-1 rounded-md";
-      case "OVERDUE":
-        return "bg-red-200 text-red-600 text-center p-1 rounded-md";
-      case "VOIDED":
+  const [entryList, SetEntryList] = useState([])
+  const [isError, setIsError] = useState(false);
+  const [page, setPage] = useState(1);
+  const [row, setRow] = useState(10);
+
+  const getStatusColor = (state) => {
+    switch (state) {
+      case "booked":
+        return "bg-teal-200 text-teal-600 text-center p-1 rounded-md";
+      case "draft":
+        return "bg-sky-200 text-sky-700 text-center p-1 rounded-md";
+      case "overue":
+        return "bg-red-200 text-red-070 text-center p-1 rounded-md";
+      case "voided":
         return "bg-gray-300 text-gray-600 text-center p-1 rounded-md";
       default:
         return "";
     }
   };
 
-  // const [entryList, SetEntryList] = useState([])
-  // const [isError, setIsError] = useState(false);
+  useEffect(() => {
+    fetch(`http://localhost:8000/api/journal-entries/?page_size=${row}&page=${page}`).then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw 'Error getting entryList list'
+      }
+    }).then((data) => {
+      SetEntryList(data.results);
+      console.log("all data", JSON.stringify(data.results))
+    }).catch((error) => {
+      setIsError(true)
+    })
+  }, [row, page])
 
-  // useEffect(() => {
-  //     fetch('https://827c-72-255-34-130.ngrok-free.app/api/journal-entries/?page_size=10&page=1').then((response) => {
-  //         if (response.ok) {
-  //             return response.json();
-  //         } else {
-  //             throw 'Error getting entryList list'
-  //         }
-  //     }).then((data) => {
-  //         SetEntryList(data);
-  //         console.log("all data",data)
-  //     }).catch((error) => {
-  //         setIsError(true)
-  //     })
-  // }, [])
-
+  const handleRowsPerPageChange = (event) => {
+    setRow(Number(event.target.value));
+    setPage(1);
+  };
 
   return (
     <>
@@ -135,8 +76,32 @@ const EntryList = () => {
                   Entry List
                 </Typography>
               </div>
+              <div>
+                <select
+                  className="bg-white border border-blue-gray-200 rounded-md px-3 py-1"
+                  value={row}
+                  onChange={handleRowsPerPageChange}
+                >
+                  <option ></option>
+                  <option value={25}>25</option>
+                  <option value={100}>100</option>
+                  <option value="all">All</option>
+                </select>
+              </div>
             </div>
           </CardHeader>
+          <div className="flex flex-row custom-parent-header">
+            <div className="input-underline">
+              <Typography variant="small" color="blue-gray" className="font-bold leading-none opacity-70 text-center">
+                INPUT AMOUNT
+              </Typography>
+            </div>
+            <div className="convert-underline">
+              <Typography variant="small" color="blue-gray" className="font-bold leading-none opacity-70 text-center">
+                CONVERTED CURRENCY
+              </Typography>
+            </div>
+          </div>
           <CardBody className="overflow-scroll px-0">
             <table className="mt-4 w-full min-w-max table-auto text-left">
               <thead>
@@ -158,33 +123,29 @@ const EntryList = () => {
                 </tr>
               </thead>
               <tbody>
-                {TABLE_ROWS.map(
+                {entryList.map(
                   (
                     {
                       id,
-                      date,
                       description,
-                      account,
-                      inputType,
-                      inputCurrency,
-                      inputNet,
-                      fxRate,
-                      convertedCurrency,
-                      convertedNet,
-                      convertedType,
-                      status,
+                      accounting_date,
+                      accounting_type,
+                      currency_detail,
+                      account_detail,
+                      amount,
+                      state,
                       reconciled,
                     },
                     index
                   ) => {
-                    const isLast = index === TABLE_ROWS.length - 1;
+                    const isLast = index === entryList.length - 1;
                     const classes = isLast
                       ? "p-4"
                       : "p-4 border-b border-blue-gray-50";
-                    const reconciledClasses = reconciled === "YES" ? "text-green-500 bg-green-100 text-center rounded-md" : "text-red-500 bg-red-100 text-center  rounded-md";
+                    const reconciledClasses = reconciled === true ? "text-green-500 bg-green-100 text-center mx-10 rounded-md" : "text-red-700 bg-red-200 mx-10 text-center rounded-md";
 
                     return (
-                      <tr key={id}>
+                      <tr key={id} style={{ backgroundColor: index % 2 === 0 ? '#ffffff' : '#edf2f7' }} >
                         <td className={classes}>
                           <div className="flex items-center gap-3">
                             <div className="flex flex-col">
@@ -193,7 +154,7 @@ const EntryList = () => {
                                 color="blue-gray"
                                 className="font-normal"
                               >
-                                {id}
+                                {id.slice(-6)}
                               </Typography>
                             </div>
                           </div>
@@ -204,6 +165,7 @@ const EntryList = () => {
                               variant="small"
                               color="blue-gray"
                               className="font-normal"
+                              style={{}}
                             >
                               {description}
                             </Typography>
@@ -215,7 +177,15 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {date}
+                            {new Date(accounting_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}                          </Typography>
+                        </td>
+                        <td className={classes}>
+                          <Typography
+                            variant="small"
+                            color="blue-gray"
+                            className="font-normal"
+                          >
+                            {account_detail && account_detail.number}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -224,7 +194,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {account}
+                            {account_detail.default_accounting_type.charAt(0).toUpperCase() + account_detail.default_accounting_type.slice(1).toLowerCase()}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -233,7 +203,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {inputType}
+                            {currency_detail && currency_detail.symbol}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -242,7 +212,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {inputCurrency}
+                            {amount}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -251,7 +221,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {inputNet}
+                            7.45
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -260,7 +230,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {fxRate}
+                            DKK
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -269,7 +239,7 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {convertedCurrency}
+                            {(amount * 7.45).toFixed(2)}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -278,26 +248,14 @@ const EntryList = () => {
                             color="blue-gray"
                             className="font-normal"
                           >
-                            {convertedNet}
-                          </Typography>
+                            {accounting_type.charAt(0).toUpperCase() + accounting_type.slice(1).toLowerCase()}                          </Typography>
                         </td>
                         <td className={classes}>
                           <Typography
                             variant="small"
-                            color="blue-gray"
-                            className="font-normal"
+                            className={`font-bold ${getStatusColor(state)}`}
                           >
-                            {convertedType}
-                          </Typography>
-                        </td>
-                        <td className={classes}>
-                          <Typography
-                            variant="small"
-                            color="blue-gray"
-                            className={`font-normal ${getStatusColor(status)}`}
-
-                          >
-                            {status}
+                            {state.toUpperCase()}
                           </Typography>
                         </td>
                         <td className={classes}>
@@ -306,9 +264,9 @@ const EntryList = () => {
                             <Typography
                               variant="small"
                               color="blue-gray"
-                              className="font-normal"
+                              className="font-bold"
                             >
-                              {reconciled}
+                              {reconciled === true ? "YES" : "NO"}
                             </Typography>
                           </div>
                         </td>

@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 body {
   margin: 0;
   font-family: "Outfit", sans-serif;
@@ -79,4 +80,44 @@ code {
 .tableHead tr th {
   border-top: 0px;
   border-bottom: 1px solid #e5e7eb;
+}
+
+.input-underline::after {
+  content: "";
+  display: block;
+  width: 10vw;
+  height: 2px;
+  background-color: rgb(114, 197, 230);
+  margin-top: 6px;
+}
+
+.convert-underline::after {
+  content: "";
+  display: block;
+  width: 10vw;
+  height: 2px;
+  background-color: rgb(92, 77, 228);
+  margin-top: 6px;
+}
+
+.custom-parent-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 0px 430px 0px 800px;
+}
+
+@media (max-width: 1440px) {
+  .custom-parent-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px 12rem 0px 40rem;
+    position: fixed;
+  }
+  .input-underline::after {
+    width: 12vw;
+  }
+
+  .convert-underline::after {
+    width: 12vw;
+  }
 }
